@@ -11,7 +11,7 @@ let parsedData  = null;
 let checklists  = [];   // [{ id, title, data: [{id, title, items: [{id, label, checked}]}] }]
 let activeId    = null;
 let authView    = 'login';
-const AUTH_REDIRECT = () => window.location.origin + window.location.pathname;
+const AUTH_REDIRECT = () => window.location.origin;
 let saving      = false;
 
 // ─── Init ─────────────────────────────────────────────────────────────────
@@ -22,7 +22,13 @@ function initSupabase() {
     return false;
   }
   try {
-    sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+    sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        detectSessionInUrl: false,
+        flowType: 'pkce',
+        persistSession: true,
+      },
+    });
     return true;
   } catch(e) {
     console.error('[CheckOps] Supabase init failed:', e.message);
@@ -37,6 +43,8 @@ async function init() {
 
   const ok = initSupabase();
   if (!ok) return;
+
+  await handleAuthCallback();
 
   const { data: { session } } = await sb.auth.getSession();
 
@@ -111,14 +119,32 @@ function updateRegisterBtn() {
   document.getElementById('register-btn').disabled = !document.getElementById('register-agreed').checked;
 }
 
+async function handleAuthCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (!code) return;
+
+  const { error } = await sb.auth.exchangeCodeForSession(code);
+  window.history.replaceState({}, document.title, window.location.pathname);
+
+  if (error) {
+    showAuthError('GitHub sign-in failed: ' + error.message);
+    return;
+  }
+}
+
 async function signInWithGitHub() {
   if (!sb) { showAuthError('Supabase is not configured.'); return; }
   clearAuthMessages();
-  const { error } = await sb.auth.signInWithOAuth({
+  const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'github',
     options: { redirectTo: AUTH_REDIRECT() },
   });
-  if (error) showAuthError(error.message);
+  if (error) {
+    showAuthError(error.message);
+    return;
+  }
+  if (data?.url) window.location.assign(data.url);
 }
 
 async function handleLoginSubmit(e) {
