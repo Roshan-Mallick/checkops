@@ -46,7 +46,9 @@ async function init() {
 
   await handleAuthCallback();
 
-  const { data: { session } } = await sb.auth.getSession();
+  const { data: { session }, error: sessionError } = await sb.auth.getSession();
+
+  if (sessionError) await clearStaleAuth();
 
   if (session?.user) {
     currentUser = session.user;
@@ -119,6 +121,11 @@ function updateRegisterBtn() {
   document.getElementById('register-btn').disabled = !document.getElementById('register-agreed').checked;
 }
 
+async function clearStaleAuth() {
+  if (!sb) return;
+  await sb.auth.signOut({ scope: 'local' });
+}
+
 async function handleAuthCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -128,6 +135,7 @@ async function handleAuthCallback() {
   window.history.replaceState({}, document.title, window.location.pathname);
 
   if (error) {
+    await clearStaleAuth();
     showAuthError('GitHub sign-in failed: ' + error.message);
     return;
   }
@@ -136,6 +144,7 @@ async function handleAuthCallback() {
 async function signInWithGitHub() {
   if (!sb) { showAuthError('Supabase is not configured.'); return; }
   clearAuthMessages();
+  await clearStaleAuth();
   const { data, error } = await sb.auth.signInWithOAuth({
     provider: 'github',
     options: { redirectTo: AUTH_REDIRECT() },
@@ -242,13 +251,181 @@ async function handleForgotSubmit(e) {
 async function enterApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-screen').style.display  = 'block';
-  const email = currentUser.email || '';
-  document.getElementById('user-email-display').textContent = email;
-  document.getElementById('user-avatar').textContent        = email[0]?.toUpperCase() || '?';
+  updateUserDisplay();
   await loadChecklists();
 }
 
+function getDisplayName(user) {
+  if (!user) return 'Account';
+  const meta = user.user_metadata || {};
+  return meta.full_name || meta.name || user.email?.split('@')[0] || 'Account';
+}
+
+function getAvatarLetter(user) {
+  const name = getDisplayName(user);
+  return name[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?';
+}
+
+function updateUserDisplay() {
+  if (!currentUser) return;
+  const name  = getDisplayName(currentUser);
+  const email = currentUser.email || '';
+  const letter = getAvatarLetter(currentUser);
+  document.getElementById('user-name-display').textContent   = name;
+  document.getElementById('user-email-display').textContent  = email;
+  document.getElementById('user-avatar').textContent           = letter;
+}
+
+function showAccountMsg(msg, type = 'success') {
+  const el = document.getElementById('account-msg');
+  el.textContent = msg;
+  el.className = 'account-msg ' + type;
+}
+
+function clearAccountMsg() {
+  const el = document.getElementById('account-msg');
+  el.textContent = '';
+  el.className = 'account-msg';
+}
+
+function showAccountModal() {
+  if (!currentUser) return;
+  clearAccountMsg();
+  const name  = getDisplayName(currentUser);
+  const email = currentUser.email || '';
+  document.getElementById('account-modal-title').textContent  = name;
+  document.getElementById('account-modal-email').textContent = email;
+  document.getElementById('account-modal-avatar').textContent  = getAvatarLetter(currentUser);
+  document.getElementById('account-name-input').value  = currentUser.user_metadata?.full_name || name;
+  document.getElementById('account-email-input').value = '';
+  document.getElementById('account-new-password').value = '';
+  document.getElementById('account-confirm-password').value = '';
+  document.getElementById('invite-email-input').value = '';
+  document.getElementById('account-modal').classList.add('open');
+}
+
+async function handleUpdateName(e) {
+  e.preventDefault();
+  if (!sb || !currentUser) return;
+  const name = document.getElementById('account-name-input').value.trim();
+  if (!name) { showAccountMsg('Please enter a name.', 'error'); return; }
+
+  const btn = document.getElementById('account-name-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const { data, error } = await sb.auth.updateUser({ data: { full_name: name } });
+    if (error) throw error;
+    currentUser = data.user;
+    updateUserDisplay();
+    document.getElementById('account-modal-title').textContent = name;
+    document.getElementById('account-modal-avatar').textContent = getAvatarLetter(currentUser);
+    showAccountMsg('Name updated successfully.');
+    showToast('Profile updated.');
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to update name.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save name';
+  }
+}
+
+async function handleChangeEmail(e) {
+  e.preventDefault();
+  if (!sb || !currentUser) return;
+  const email = document.getElementById('account-email-input').value.trim();
+  if (!email) { showAccountMsg('Please enter a new email.', 'error'); return; }
+
+  const btn = document.getElementById('account-email-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    const { error } = await sb.auth.updateUser({ email });
+    if (error) throw error;
+    showAccountMsg('Confirmation sent — check your new inbox (and spam folder).');
+    showToast('Email confirmation sent.');
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to update email.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Update email';
+  }
+}
+
+async function handleChangePassword(e) {
+  e.preventDefault();
+  if (!sb || !currentUser) return;
+  const pw  = document.getElementById('account-new-password').value;
+  const confirm = document.getElementById('account-confirm-password').value;
+  if (pw.length < 8) { showAccountMsg('Password must be at least 8 characters.', 'error'); return; }
+  if (pw !== confirm) { showAccountMsg('Passwords do not match.', 'error'); return; }
+
+  const btn = document.getElementById('account-password-btn');
+  btn.disabled = true;
+  btn.textContent = 'Updating…';
+
+  try {
+    const { error } = await sb.auth.updateUser({ password: pw });
+    if (error) throw error;
+    document.getElementById('account-new-password').value = '';
+    document.getElementById('account-confirm-password').value = '';
+    showAccountMsg('Password updated successfully.');
+    showToast('Password changed.');
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to change password.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Change password';
+  }
+}
+
+async function handleAccountPasswordReset() {
+  if (!sb || !currentUser?.email) return;
+  clearAccountMsg();
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(currentUser.email, {
+      redirectTo: AUTH_REDIRECT(),
+    });
+    if (error) throw error;
+    showAccountMsg('Reset link sent to ' + currentUser.email);
+    showToast('Password reset email sent.');
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to send reset link.', 'error');
+  }
+}
+
+function handleSendInvite(e) {
+  e.preventDefault();
+  const to = document.getElementById('invite-email-input').value.trim();
+  if (!to) { showAccountMsg('Enter an email address to invite.', 'error'); return; }
+
+  const link = window.location.origin;
+  const from = getDisplayName(currentUser);
+  const subject = encodeURIComponent(`${from} invited you to CheckOps`);
+  const body = encodeURIComponent(
+    `Hi,\n\n${from} invited you to join CheckOps — persistent checklists for engineering teams.\n\nSign up here: ${link}\n\nSee you there!`
+  );
+  window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_blank');
+  showAccountMsg('Invite opened in your email app.');
+  showToast('Invite email ready to send.');
+}
+
+async function copyInviteLink() {
+  const link = window.location.origin;
+  try {
+    await navigator.clipboard.writeText(link);
+    showAccountMsg('Invite link copied to clipboard.');
+    showToast('Invite link copied.');
+  } catch {
+    showAccountMsg('Could not copy — link: ' + link, 'error');
+  }
+}
+
 async function signOut() {
+  closeModal('account-modal');
+  closeSidebar();
   if (sb) await sb.auth.signOut();
   currentUser = null;
   activeId    = null;
@@ -392,6 +569,7 @@ function loadChecklist(id) {
   if (!cl) { showEmptyState(); return; }
   renderChecklist(cl);
   renderSidebar();
+  closeSidebar();
 }
 
 function renderChecklist(cl) {
@@ -598,9 +776,38 @@ function showUploadModal() {
   parsedData = null;
   document.getElementById('import-btn').style.display    = 'none';
   document.getElementById('parse-preview').style.display = 'none';
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.classList.remove('drag');
+    zone.querySelector('.upload-zone-text').textContent = 'Drop your .md file here';
+  }
+  document.getElementById('md-file-input').value = '';
 }
-function showNewListModal() { showUploadModal(); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showNewListModal() {
+  document.getElementById('new-checklist-modal').classList.add('open');
+}
+function chooseUploadChecklist() {
+  closeModal('new-checklist-modal');
+  showUploadModal();
+}
+function chooseBlankChecklist() {
+  closeModal('new-checklist-modal');
+  createBlankChecklist();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('open');
+}
 
 function handleDragOver(e)  { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
 function handleDragLeave()  { document.getElementById('upload-zone').classList.remove('drag'); }
