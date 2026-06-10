@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CheckOps — Persistent Checklists</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── AUTH SCREEN ──────────────────────────────────────────────── -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">✓</div>
+        <span class="auth-logo-text">CheckOps</span>
+      </div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Persistent checklists, always in sync.</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Sign in</button>
+        <button class="auth-tab" onclick="switchTab('signup')">Create account</button>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+      <div id="auth-msg" class="auth-msg"></div>
+      <div class="field">
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" />
+      </div>
+      <div class="field">
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter') doAuth()" />
+      </div>
+      <button class="btn-primary" id="auth-btn" onclick="doAuth()">Sign in</button>
+      <p class="auth-footer-note">No tracking. No ads. Your data stays yours.</p>
+    </div>
+  </div>
+
+  <!-- ─── APP SCREEN ───────────────────────────────────────────────── -->
+  <div id="app-screen">
+    <div class="app-layout">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">✓</div>
+            <span class="sidebar-logo-text">CheckOps</span>
+          </div>
+          <button class="btn-new" onclick="showNewListModal()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <line x1="8" y1="2" x2="8" y2="14"/>
+              <line x1="2" y1="8" x2="14" y2="8"/>
+            </svg>
+            New checklist
+          </button>
+        </div>
+        <div class="sidebar-section-label">My checklists</div>
+        <div class="sidebar-lists" id="sidebar-lists"></div>
+        <div class="sidebar-footer">
+          <div class="avatar" id="user-avatar">?</div>
+          <div class="user-email" id="user-email-display">—</div>
+          <button class="btn-signout" onclick="signOut()">Sign out</button>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main" id="main-content">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">☑</div>
+          <div class="empty-title">No checklist selected</div>
+          <div class="empty-sub">Create a new checklist from scratch or upload a Markdown template to get started.</div>
+          <div class="empty-actions">
+            <button class="btn-outline" onclick="showUploadModal()">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3"/>
+              </svg>
+              Upload .md template
+            </button>
+            <button class="btn-violet" onclick="createBlankChecklist()">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <line x1="8" y1="2" x2="8" y2="14"/>
+                <line x1="2" y1="8" x2="14" y2="8"/>
+              </svg>
+              Blank checklist
+            </button>
+          </div>
+        </div>
+        <div id="checklist-view" class="checklist-view" style="display:none;"></div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ─── UPLOAD MODAL ─────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="upload-modal">
+    <div class="modal">
+      <div class="modal-title">Import Markdown checklist</div>
+      <div class="modal-sub">
+        Upload a <code>.md</code> file with <code>##</code> headings and
+        <code>- [ ]</code> items. Structure is preserved; every tick saves to your account.
+      </div>
+      <div class="upload-zone" id="upload-zone"
+           onclick="document.getElementById('md-file-input').click()"
+           ondragover="handleDragOver(event)"
+           ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)">
+        <div class="upload-zone-icon">📄</div>
+        <div class="upload-zone-text">Drop your .md file here</div>
+        <div class="upload-zone-sub">or click to browse</div>
+      </div>
+      <input type="file" id="md-file-input" accept=".md,.markdown,text/markdown"
+             style="display:none" onchange="handleFileSelect(this)" />
+      <div class="parse-preview" id="parse-preview"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('upload-modal')">Cancel</button>
+        <button class="btn-violet" id="import-btn" onclick="importChecklist()" style="display:none">Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TOASTS ───────────────────────────────────────────────────── -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
