@@ -362,7 +362,7 @@ function toggleItem(si, ii, checked) {
   persistChecklist(cl);
   updateHeader(cl);
   renderSidebar();
-  const row = document.querySelector(`[data-si="${si}"] [data-ii="${ii}"]`);
+  const row = document.querySelector(`[data-si="${si}"][data-ii="${ii}"]`)
   if (row) row.classList.toggle('checked', checked);
   const sec     = cl.data[si];
   const countEl = document.querySelector(`[data-si="${si}"] .section-count`);
