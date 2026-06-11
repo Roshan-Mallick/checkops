@@ -886,3 +886,65 @@ body::after {
 
   .footer-grid { flex-direction: column; }
 }
+
+/* ── Extra Small Screens (≤ 480px) ──────────────────────── */
+@media (max-width: 480px) {
+
+  .container {
+    width: calc(100% - 2rem);
+  }
+
+  .section-padding { padding-block: 3.5rem; }
+
+  .hero {
+    padding-top: 70px;
+    min-height: 100svh;
+  }
+
+  .hero-headline {
+    font-size: clamp(1.9rem, 7vw, 2.5rem);
+  }
+
+  .hero-sub {
+    font-size: .95rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-window {
+    border-radius: 1rem;
+  }
+
+  .capability-card,
+  .pricing-card,
+  .workflow-step {
+    padding: 1.25rem;
+  }
+
+  .quote-text {
+    padding: 1.25rem 1.25rem 1.25rem 1rem;
+    font-size: .95rem;
+  }
+
+  .nav {
+    padding: .85rem 1rem;
+  }
+
+  .trust-logos {
+    gap: 1.25rem;
+    font-size: .8rem;
+  }
+
+  .footer {
+    padding: 2.5rem 0 1.5rem;
+  }
+}
