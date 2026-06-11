@@ -352,7 +352,7 @@ body {
 }
 
 .sidebar-header { padding: 22px 18px 18px; }
-.app-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.app-brand { display: flex; align-items: center; gap: 10px; }
 .app-brand-icon {
   width: 24px; height: 24px; background: var(--accent);
   border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -603,7 +603,7 @@ body {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.modal-wide { max-width: 540px; }
+
 .modal-label { font-size: 12px; font-weight: 500; color: var(--accent); margin-bottom: 6px; }
 .modal-title { font-size: clamp(18px, 3vw, 22px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
 .modal-sub { font-size: 14px; color: var(--text2); margin-bottom: 22px; line-height: 1.6; }
@@ -707,8 +707,31 @@ body {
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (min-width: 641px) {
-  .modal-overlay { align-items: center; padding: 24px; }
+  .modal-overlay { align-items: center; padding: 32px; }
   .modal { border-radius: var(--radius-xl); animation: modalIn 0.3s var(--ease); }
+  .modal-wide {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 0;
+    padding: 0;
+    max-width: 720px;
+    min-height: 520px;
+    overflow: hidden;
+}
+ .account-modal-sidebar {
+    background: var(--surface2);
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: flex-start;
+}
+  .account-modal-body {
+    padding: 32px 36px;
+    overflow-y: auto;
+    max-height: 88vh;
+  }
   @keyframes modalIn {
     from { opacity: 0; transform: scale(0.97) translateY(8px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
@@ -879,4 +902,110 @@ body {
   .footer {
     padding: 2.5rem 0 1.5rem;
   }
+}
+
+.sidebar-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.sidebar-avatar-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.sidebar-avatar-btn .avatar {
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+  transition: border-color 0.2s;
+}
+
+.sidebar-avatar-btn:hover .avatar {
+  border-color: var(--accent);
+}
+
+
+
+/* Account modal nav sidebar */
+.account-modal-sidebar { display: none; }
+.account-modal-body { display: contents; }
+
+.account-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--sans);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.account-nav-item:hover { background: var(--surface3); color: var(--text); }
+.account-nav-item.active { background: var(--accent-dim); color: var(--accent); }
+.account-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.account-nav-user-info { min-width: 0; }
+.account-nav-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-nav-user-email {
+  font-size: 11px;
+  color: var(--text3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-nav-signout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--danger);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: var(--sans);
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+.account-nav-signout:hover { background: rgba(224,122,122,0.08); }
+
+/* Hide bottom sidebar footer on mobile */
+@media (max-width: 900px) {
+  .sidebar-footer { display: none; }
+}
+
+@media (min-width: 641px) {
+  .account-modal-sidebar { display: flex; flex-direction: column; }
+  .account-modal-body { display: block; }
 }

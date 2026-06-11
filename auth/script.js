@@ -328,12 +328,15 @@ function getAvatarLetter(user) {
 
 function updateUserDisplay() {
   if (!currentUser) return;
-  const name  = getDisplayName(currentUser);
-  const email = currentUser.email || '';
+  const name   = getDisplayName(currentUser);
+  const email  = currentUser.email || '';
   const letter = getAvatarLetter(currentUser);
-  document.getElementById('user-name-display').textContent   = name;
-  document.getElementById('user-email-display').textContent  = email;
-  document.getElementById('user-avatar').textContent           = letter;
+  document.getElementById('user-name-display').textContent  = name;
+  document.getElementById('user-email-display').textContent = email;
+  document.getElementById('user-avatar').textContent        = letter;
+  // also update top avatar
+  const topAvatar = document.getElementById('user-avatar-top');
+  if (topAvatar) topAvatar.textContent = letter;
 }
 
 function showAccountMsg(msg, type = 'success') {
@@ -350,18 +353,55 @@ function clearAccountMsg() {
 
 function showAccountModal() {
   if (!currentUser) return;
+
   clearAccountMsg();
-  const name  = getDisplayName(currentUser);
+
+  const name = getDisplayName(currentUser);
   const email = currentUser.email || '';
-  document.getElementById('account-modal-title').textContent  = name;
-  document.getElementById('account-modal-email').textContent = email;
-  document.getElementById('account-modal-avatar').textContent  = getAvatarLetter(currentUser);
-  document.getElementById('account-name-input').value  = currentUser.user_metadata?.full_name || name;
-  document.getElementById('account-email-input').value = '';
-  document.getElementById('account-new-password').value = '';
-  document.getElementById('account-confirm-password').value = '';
-  document.getElementById('invite-email-input').value = '';
-  document.getElementById('account-modal').classList.add('open');
+  const letter = getAvatarLetter(currentUser);
+
+  // Desktop header
+
+  const avatarEl = document.getElementById('account-modal-avatar');
+  if (avatarEl) avatarEl.textContent = letter;
+
+  // Form fields
+  const nameInput = document.getElementById('account-name-input');
+  if (nameInput) {
+    nameInput.value = currentUser.user_metadata?.full_name || name;
+  }
+
+  const emailInput = document.getElementById('account-email-input');
+  if (emailInput) emailInput.value = '';
+
+  const newPasswordInput = document.getElementById('account-new-password');
+  if (newPasswordInput) newPasswordInput.value = '';
+
+  const confirmPasswordInput = document.getElementById('account-confirm-password');
+  if (confirmPasswordInput) confirmPasswordInput.value = '';
+
+  const inviteInput = document.getElementById('invite-email-input');
+  if (inviteInput) inviteInput.value = '';
+
+  // Mobile header
+  const mobileTitle = document.getElementById('account-modal-title-mobile');
+  if (mobileTitle) mobileTitle.textContent = name;
+
+  const mobileEmail = document.getElementById('account-modal-email-mobile');
+  if (mobileEmail) mobileEmail.textContent = email;
+
+  const mobileAvatar = document.getElementById('account-modal-avatar-mobile');
+  if (mobileAvatar) mobileAvatar.textContent = letter;
+
+  // Default section
+  if (typeof showAccountSection === 'function') {
+    showAccountSection('profile');
+  }
+
+  const modal = document.getElementById('account-modal');
+  if (modal) {
+    modal.classList.add('open');
+  }
 }
 
 async function handleUpdateName(e) {
@@ -952,3 +992,15 @@ function esc(s) {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────
 init();
+
+
+function showAccountSection(section) {
+  const sections = ['profile', 'email', 'password', 'invite'];
+  sections.forEach(s => {
+    const el = document.getElementById('account-sec-' + s);
+    if (el) el.style.display = s === section ? 'block' : 'none';
+  });
+  document.querySelectorAll('.account-nav-item').forEach((btn, i) => {
+    btn.classList.toggle('active', sections[i] === section);
+  });
+}
