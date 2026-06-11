@@ -132,6 +132,31 @@ async function handleAuthCallback() {
     return;
   }
 }
+async function signInWithGoogle() {
+  if (!sb) {
+    showAuthError('Supabase is not configured.');
+    return;
+  }
+
+  clearAuthMessages();
+  await clearStaleAuth();
+
+  const { data, error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: AUTH_REDIRECT()
+    }
+  });
+
+  if (error) {
+    showAuthError(error.message);
+    return;
+  }
+
+  if (data?.url) {
+    window.location.assign(data.url);
+  }
+}
 
 async function signInWithGitHub() {
   if (!sb) { showAuthError('Supabase is not configured.'); return; }
