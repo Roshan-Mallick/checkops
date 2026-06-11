@@ -572,6 +572,40 @@ function handleSendInvite(e) {
   showToast('Invite email ready to send.');
 }
 
+async function handleDeleteAccount() {
+  if (!sb || !currentUser) return;
+
+  const confirmed = confirm(
+    'This will permanently delete your account and ALL checklists. This cannot be undone.\n\nType OK to confirm.'
+  );
+  if (!confirmed) return;
+
+  const btn = document.querySelector('.btn-danger-outline');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+
+  try {
+    const { error } = await sb.rpc('delete_own_account');
+    if (error) throw error;
+
+    // Clean up local state
+    currentUser = null;
+    activeId = null;
+    checklists = [];
+
+    closeModal('account-modal');
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+    switchAuthView('login');
+    showToast('Account deleted.');
+
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to delete account.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Delete my account';
+  }
+}
+
 async function copyInviteLink() {
   const link = window.location.origin;
   try {
@@ -1055,7 +1089,7 @@ init();
 
 
 function showAccountSection(section) {
-  const sections = ['profile', 'email', 'password', 'invite'];
+  const sections = ['profile', 'email', 'password', 'invite', 'danger'];
   sections.forEach(s => {
     const el = document.getElementById('account-sec-' + s);
     if (el) el.style.display = s === section ? 'block' : 'none';
@@ -1063,4 +1097,39 @@ function showAccountSection(section) {
   document.querySelectorAll('.account-nav-item').forEach((btn, i) => {
     btn.classList.toggle('active', sections[i] === section);
   });
+}
+
+
+async function handleDeleteAccount() {
+  if (!sb || !currentUser) return;
+
+  const confirmed = confirm(
+    'This will permanently delete your account and ALL checklists. This cannot be undone.\n\nType OK to confirm.'
+  );
+  if (!confirmed) return;
+
+  const btn = document.querySelector('.btn-danger-outline');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+
+  try {
+    const { error } = await sb.rpc('delete_own_account');
+    if (error) throw error;
+
+    // Clean up local state
+    currentUser = null;
+    activeId = null;
+    checklists = [];
+
+    closeModal('account-modal');
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+    switchAuthView('login');
+    showToast('Account deleted.');
+
+  } catch (err) {
+    showAccountMsg(err.message || 'Failed to delete account.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Delete my account';
+  }
 }
