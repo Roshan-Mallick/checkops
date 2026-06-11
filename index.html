@@ -1,419 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CheckOps — Persistent Checklists</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Persistent Checklists for Engineering Teams</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <meta name="description" content="Build repeatable processes, track progress across sessions, and keep operational knowledge alive. Persistent checklists for engineering teams.">
+  <meta name="theme-color" content="#050507">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ─── AUTH SCREEN ──────────────────────────────────────────────── -->
-  <div id="auth-screen">
-    <header class="auth-header">
-      <div class="auth-brand">
-        <div class="auth-brand-icon">
-          <svg width="11" height="9" viewBox="0 0 11 9" fill="none" aria-hidden="true">
-            <path d="M1 4.5L4 7.5L10 1" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+  <!-- Navigation -->
+  <nav class="nav" aria-label="Primary navigation">
+    <div class="nav-logo">
+       <img src="checkpos.png" alt="CheckOps Logo" class="nav-logo-icon">
+       <span class="nav-logo-text">CheckOps</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#capabilities">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">Changelog</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">☰</button><a href="auth/index.html" target="_blank" class="nav-cta">Start Free</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero reveal" id="hero">
+    <div class="container">
+      <div class="hero-content">
+        <p class="hero-eyebrow">Persistent Checklists</p>
+        <h1 class="hero-headline">The operational system your team actually remembers.</h1>
+        <p class="hero-sub">Build repeatable processes, track progress across sessions, and keep operational knowledge alive long after deployments, incidents, and handoffs.</p>
+        <div class="hero-actions">
+          <a href="auth/index.html" target="_blank" class="btn-primary">Start Free</a>
+          <a href="#showcase" class="btn-secondary">View Demo</a>
         </div>
-        <span class="auth-brand-text">CheckOps</span>
       </div>
-      <div class="auth-header-tabs">
-        <button class="auth-header-tab active" id="auth-tab-login" onclick="switchAuthView('login')">Sign in</button>
-        <button class="auth-header-tab" id="auth-tab-register" onclick="switchAuthView('register')">Register</button>
-      </div>
-    </header>
 
-    <div class="auth-main">
-      <!-- Left marketing panel -->
-      <aside class="auth-panel-left">
-        <div class="auth-panel-grid"></div>
-        <div class="auth-panel-glow"></div>
-        <div class="auth-panel-top">
-          <div class="auth-beta-label">v0.9.4 · public beta</div>
-          <h2 class="auth-panel-title">Ship with a<br /><span>complete record.</span></h2>
-          <p class="auth-panel-desc">Persistent checklists for engineering teams. Track every deploy, incident, and release gate — without losing state.</p>
-        </div>
-        <div class="auth-panel-bottom">
-          <div class="auth-terminal">
-            <div class="auth-terminal-dots">
-              <span style="background:#ff6058"></span>
-              <span style="background:#ffc130"></span>
-              <span style="background:#27c93f"></span>
-            </div>
-            <pre class="auth-terminal-pre"><span class="t-dim">$ </span><span class="t-bright">npx checklists run deploy</span>
-<span class="t-green">✓</span><span class="t-dim"> Run migrations          </span><span class="t-faint">2s</span>
-<span class="t-green">✓</span><span class="t-dim"> Verify feature flags    </span><span class="t-faint">1s</span>
-<span class="t-blue">→</span><span class="t-muted"> Notify #releases        </span><span class="t-faint">…</span>
-<span class="t-ghost">  resumed · 2 of 5 complete</span></pre>
+      <div class="hero-visual">
+        <div class="hero-window">
+          <div class="hero-window-bar">
+            <span class="dot dot-red" aria-hidden="true"></span>
+            <span class="dot dot-yellow" aria-hidden="true"></span>
+            <span class="dot dot-green" aria-hidden="true"></span>
+            <span class="hero-window-title">CheckOps — Production Deploy</span>
           </div>
-          <div class="auth-stats">
-            <div><div class="auth-stat-val">12k+</div><div class="auth-stat-lbl">Engineers</div></div>
-            <div><div class="auth-stat-val">98%</div><div class="auth-stat-lbl">Uptime SLA</div></div>
-            <div><div class="auth-stat-val">SOC 2</div><div class="auth-stat-lbl">Compliant</div></div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Right form panel -->
-      <div class="auth-panel-right">
-        <div class="auth-form-wrap">
-          <div id="auth-error" class="auth-error"></div>
-          <div id="auth-msg" class="auth-msg"></div>
-
-          <!-- Login -->
-          <div id="auth-view-login" class="auth-view">
-            <div class="auth-form-header">
-              <div class="auth-form-label">Sign in</div>
-              <h1 class="auth-form-title">Welcome back.</h1>
+          <div class="hero-window-content">
+            <div class="hero-progress-row">
+              <span class="hero-progress-label">Overall Progress</span>
+              <span class="hero-progress-text">12/16 completed</span>
+              <div class="hero-progress-bar"><div class="hero-progress-fill" style="width: 75%"></div></div>
             </div>
-            <button type="button" class="auth-oauth-btn" onclick="signInWithGitHub()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              Continue with GitHub
-            </button>
-            <div class="auth-divider"><span>or</span></div>
-            <form class="auth-form" onsubmit="handleLoginSubmit(event)">
-              <div class="auth-field">
-                <label for="login-email">Email</label>
-                <input type="email" id="login-email" placeholder="you@company.com" autocomplete="email" required />
-              </div>
-              <div class="auth-field">
-                <div class="auth-field-row">
-                  <label for="login-password">Password</label>
-                  <button type="button" class="auth-inline-btn" onclick="switchAuthView('forgot')">Forgot password?</button>
-                </div>
-                <div class="auth-pass-wrap">
-                  <input type="password" id="login-password" placeholder="••••••••••" autocomplete="current-password" required />
-                  <button type="button" class="auth-pass-toggle" onclick="togglePassword('login-password', this)" aria-label="Show password">
-                    <svg class="icon-eye" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="icon-eye-off" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  </button>
-                </div>
-              </div>
-              <button type="submit" class="auth-submit-btn" id="login-btn">Sign in</button>
-            </form>
-            <p class="auth-form-footer">No account? <button type="button" class="auth-link" onclick="switchAuthView('register')">Create one</button></p>
-          </div>
 
-          <!-- Register -->
-          <div id="auth-view-register" class="auth-view" hidden>
-            <div class="auth-form-header">
-              <div class="auth-form-label">Create account</div>
-              <h1 class="auth-form-title">Get started free.</h1>
+            <!-- PRE-DEPLOY -->
+            <div class="hero-section-group">
+              <h3 class="hero-section-title">PRE-DEPLOY</h3>
+              <ul class="hero-checklist">
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Run database migration scripts</span></li>
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Verify staging environment passes smoke tests</span></li>
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Notify on-call engineer of deploy window</span></li>
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Update feature flags in LaunchDarkly</span></li>
+              </ul>
             </div>
-            <button type="button" class="auth-oauth-btn" onclick="signInWithGitHub()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              Continue with GitHub
-            </button>
-            <div class="auth-divider"><span>or</span></div>
-            <form class="auth-form" onsubmit="handleRegisterSubmit(event)">
-              <div class="auth-field">
-                <label for="register-name">Full name</label>
-                <input type="text" id="register-name" placeholder="Ada Lovelace" autocomplete="name" required />
-              </div>
-              <div class="auth-field">
-                <label for="register-email">Work email</label>
-                <input type="email" id="register-email" placeholder="you@company.com" autocomplete="email" required />
-              </div>
-              <div class="auth-field">
-                <label for="register-password">Password</label>
-                <div class="auth-pass-wrap">
-                  <input type="password" id="register-password" placeholder="••••••••••" autocomplete="new-password" required oninput="updatePasswordStrength()" />
-                  <button type="button" class="auth-pass-toggle" onclick="togglePassword('register-password', this)" aria-label="Show password">
-                    <svg class="icon-eye" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="icon-eye-off" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  </button>
-                </div>
-                <div id="password-strength" class="auth-strength" hidden>
-                  <div class="auth-strength-bars">
-                    <span></span><span></span><span></span><span></span>
-                  </div>
-                  <span class="auth-strength-label"></span>
-                </div>
-              </div>
-              <label class="auth-checkbox">
-                <input type="checkbox" id="register-agreed" onchange="updateRegisterBtn()" />
-                <span class="auth-checkbox-box"></span>
-                <span class="auth-checkbox-text">I agree to the <button type="button" class="auth-link">Terms of Service</button> and <button type="button" class="auth-link">Privacy Policy</button></span>
-              </label>
-              <button type="submit" class="auth-submit-btn" id="register-btn" disabled>Create account</button>
-            </form>
-            <p class="auth-form-footer">Already have an account? <button type="button" class="auth-link" onclick="switchAuthView('login')">Sign in</button></p>
-          </div>
 
-          <!-- Forgot password -->
-          <div id="auth-view-forgot" class="auth-view" hidden>
-            <button type="button" class="auth-back-link" onclick="switchAuthView('login')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Back to sign in
-            </button>
-            <div class="auth-form-header">
-              <div class="auth-form-label">Password reset</div>
-              <h1 class="auth-form-title">Reset your password.</h1>
+            <!-- DEPLOY -->
+            <div class="hero-section-group">
+              <h3 class="hero-section-title">DEPLOY</h3>
+              <ul class="hero-checklist">
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Execute rolling deploy to production</span></li>
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Monitor error rate dashboard for 15 min</span></li>
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Run integration test suite against prod</span></li>
+              </ul>
             </div>
-            <p class="auth-form-desc">Enter the email linked to your account. We'll send a reset link if it matches.</p>
-            <form class="auth-form" onsubmit="handleForgotSubmit(event)">
-              <div class="auth-field">
-                <label for="forgot-email">Email</label>
-                <input type="email" id="forgot-email" placeholder="you@company.com" autocomplete="email" required />
-              </div>
-              <button type="submit" class="auth-submit-btn" id="forgot-btn">Send reset link</button>
-            </form>
-          </div>
 
-          <!-- Forgot sent confirmation -->
-          <div id="auth-view-forgot-sent" class="auth-view" hidden>
-            <button type="button" class="auth-back-link" onclick="switchAuthView('login')">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Back to sign in
-            </button>
-            <div class="auth-sent-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <!-- POST-DEPLOY -->
+            <div class="hero-section-group">
+              <h3 class="hero-section-title">POST-DEPLOY</h3>
+              <ul class="hero-checklist">
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Send deploy summary to #engineering</span></li>
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Update runbook with any deviations</span></li>
+              </ul>
             </div>
-            <div class="auth-form-label">Check your inbox</div>
-            <h1 class="auth-form-title">Instructions sent.</h1>
-            <p class="auth-form-desc">If that address is on file, you'll receive a link within a few minutes. Check spam if needed.</p>
-            <button type="button" class="auth-outline-btn" onclick="switchAuthView('login')">Back to sign in</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── APP SCREEN ───────────────────────────────────────────────── -->
-  <div id="app-screen">
-    <header class="app-topbar">
-      <button type="button" class="app-menu-btn" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
-      <div class="app-topbar-brand">
-        <div class="app-brand-icon sm">
-          <svg width="10" height="8" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="#0a0a0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <span>CheckOps</span>
+  <!-- Trust Strip -->
+  <section class="trust-strip section-padding reveal" id="trust">
+    <div class="container">
+      <p class="trust-label">Trusted by engineering teams at</p>
+      <div class="trust-logos">
+        <span>Vercel</span>
+        <span>Linear</span>
+        <span>Raycast</span>
+        <span>Notion</span>
+        <span>Stripe</span>
+        <span>Datadog</span>
       </div>
-      <button type="button" class="app-topbar-new" onclick="showNewListModal()">New</button>
-    </header>
-    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
-    <div class="app-layout">
+    </div>
+  </section>
 
-      <!-- Sidebar -->
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-          <div class="app-brand">
-            <div class="app-brand-icon">
-              <svg width="11" height="9" viewBox="0 0 11 9" fill="none" aria-hidden="true">
-                <path d="M1 4.5L4 7.5L10 1" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+  <!-- Showcase -->
+  <section class="showcase section-padding reveal" id="showcase">
+    <div class="container">
+      <div class="showcase-text">
+        <p class="showcase-eyebrow">Product</p>
+        <h2 class="section-title">One checklist. Every detail tracked.</h2>
+        <p class="body-text">CheckOps replaces scattered documents and forgotten Slack threads with structured, persistent checklists that survive across sessions, teams, and time zones.</p>
+        <ul class="showcase-features">
+          <li><span class="feature-check" aria-hidden="true">✓</span>Real-time progress tracking across team members</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span>Markdown import from existing runbooks</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span>Automatic cloud sync with zero configuration</li>
+          <li><span class="feature-check" aria-hidden="true">✓</span>Row-level security isolates team data</li>
+        </ul>
+      </div>
+      <div class="showcase-visual">
+        <div class="hero-window">
+          <div class="hero-window-bar">
+            <span class="dot dot-red" aria-hidden="true"></span>
+            <span class="dot dot-yellow" aria-hidden="true"></span>
+            <span class="dot dot-green" aria-hidden="true"></span>
+            <span class="hero-window-title">CheckOps — Incident Response</span>
+          </div>
+          <div class="hero-window-content">
+            <div class="hero-section-group">
+              <h3 class="hero-section-title">TRIAGE</h3>
+              <ul class="hero-checklist">
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Identify affected services</span></li>
+                <li class="hero-item checked"><span class="hero-checkbox" aria-hidden="true">✓</span><span>Page incident commander</span></li>
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Open bridge call</span></li>
+              </ul>
             </div>
-            <span class="app-brand-text">CheckOps</span>
-          </div>
-          <button class="btn-new" onclick="showNewListModal()">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <line x1="8" y1="2" x2="8" y2="14"/>
-              <line x1="2" y1="8" x2="14" y2="8"/>
-            </svg>
-            New checklist
-          </button>
-        </div>
-        <div class="sidebar-section-label">My checklists</div>
-        <div class="sidebar-lists" id="sidebar-lists"></div>
-        <div class="sidebar-footer">
-          <button type="button" class="account-trigger" onclick="showAccountModal()" title="Account settings">
-            <div class="avatar" id="user-avatar">?</div>
-            <div class="account-trigger-info">
-              <span class="account-name" id="user-name-display">Account</span>
-              <span class="user-email" id="user-email-display">—</span>
+            <div class="hero-section-group">
+              <h3 class="hero-section-title">MITIGATE</h3>
+              <ul class="hero-checklist">
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Roll back to last known good</span></li>
+                <li class="hero-item"><span class="hero-checkbox" aria-hidden="true"></span><span>Verify rollback in monitoring</span></li>
+              </ul>
             </div>
-            <svg class="account-settings-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-            </svg>
-          </button>
-        </div>
-      </aside>
-
-      <!-- Main -->
-      <main class="main" id="main-content">
-        <div class="empty-state" id="empty-state">
-          <div class="empty-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
-            </svg>
-          </div>
-          <div class="empty-label">Dashboard</div>
-          <div class="empty-title">No checklist selected</div>
-          <div class="empty-sub">Create a new checklist from scratch or upload a Markdown template to get started.</div>
-          <div class="empty-actions">
-            <button class="btn-outline" onclick="showUploadModal()">
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3"/>
-              </svg>
-              Upload .md template
-            </button>
-            <button class="btn-primary" onclick="createBlankChecklist()">
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <line x1="8" y1="2" x2="8" y2="14"/>
-                <line x1="2" y1="8" x2="14" y2="8"/>
-              </svg>
-              Blank checklist
-            </button>
           </div>
         </div>
-        <div id="checklist-view" class="checklist-view" style="display:none;"></div>
-      </main>
-
-    </div>
-  </div>
-
-  <!-- ─── NEW CHECKLIST MODAL ──────────────────────────────────────── -->
-  <div class="modal-overlay" id="new-checklist-modal">
-    <div class="modal">
-      <div class="modal-label">New checklist</div>
-      <div class="modal-title">How would you like to start?</div>
-      <div class="modal-sub">Upload an existing Markdown file or create a blank checklist from scratch.</div>
-      <div class="new-checklist-options">
-        <button type="button" class="new-option-card" onclick="chooseUploadChecklist()">
-          <div class="new-option-icon">
-            <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3"/>
-            </svg>
-          </div>
-          <div class="new-option-title">Upload .md template</div>
-          <div class="new-option-desc">Import headings and checkbox items from a Markdown file.</div>
-        </button>
-        <button type="button" class="new-option-card" onclick="chooseBlankChecklist()">
-          <div class="new-option-icon primary">
-            <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
-              <line x1="8" y1="2" x2="8" y2="14"/>
-              <line x1="2" y1="8" x2="14" y2="8"/>
-            </svg>
-          </div>
-          <div class="new-option-title">Blank checklist</div>
-          <div class="new-option-desc">Start fresh with an empty checklist you can edit inline.</div>
-        </button>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('new-checklist-modal')">Cancel</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── UPLOAD MODAL ─────────────────────────────────────────────── -->
-  <div class="modal-overlay" id="upload-modal">
-    <div class="modal">
-      <div class="modal-label">Import</div>
-      <div class="modal-title">Import Markdown checklist</div>
-      <div class="modal-sub">
-        Upload a <code>.md</code> file with <code>##</code> headings and
-        <code>- [ ]</code> items. Structure is preserved; every tick saves to your account.
+  <!-- Capabilities -->
+  <section class="capabilities section-padding reveal" id="capabilities">
+    <div class="container">
+      <p class="capabilities-eyebrow">Capabilities</p>
+      <h2 class="section-title">Built for operational excellence</h2>
+      <div class="capabilities-grid">
+        <article class="capability-card">
+          <span class="capability-icon" aria-hidden="true"><img src="assets/sync.png" alt="sync">sync</span>
+          <h3 class="capability-title">Instant Sync</h3>
+          <p class="capability-desc">Changes persist immediately to the cloud. No save buttons, no lost progress. Your checklists are always current.</p>
+        </article>
+        <article class="capability-card">
+          <span class="capability-icon" aria-hidden="true"><img src="assets/md.png" alt="md">md</span>
+          <h3 class="capability-title">Markdown Import</h3>
+          <p class="capability-desc">Import existing runbooks and procedures directly from .md files. Your team's knowledge, structured automatically.</p>
+        </article>
+        <article class="capability-card">
+          <span class="capability-icon" aria-hidden="true"><img src="assets/secure.png" alt="secure">secure</span>
+          <h3 class="capability-title">Secure by Default</h3>
+          <p class="capability-desc">Row-level security ensures complete data isolation. Every checklist belongs to its owner, enforced at the database level.</p>
+        </article>
       </div>
-      <div class="upload-zone" id="upload-zone"
-           onclick="document.getElementById('md-file-input').click()"
-           ondragover="handleDragOver(event)"
-           ondragleave="handleDragLeave(event)"
-           ondrop="handleDrop(event)">
-        <div class="upload-zone-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/></svg>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="workflow section-padding reveal" id="workflow">
+    <div class="container">
+      <p class="workflow-eyebrow">How it works</p>
+      <h2 class="section-title">From runbook to repeatable process</h2>
+      <div class="workflow-timeline">
+        <div class="workflow-step">
+          <div class="workflow-dot" aria-hidden="true">1</div>
+          <div class="workflow-step-content">
+            <h3 class="workflow-step-title">Import</h3>
+            <p class="workflow-step-desc">Paste your existing markdown runbook or create a fresh checklist from scratch.</p>
+          </div>
         </div>
-        <div class="upload-zone-text">Drop your .md file here</div>
-        <div class="upload-zone-sub">or click to browse</div>
-      </div>
-      <input type="file" id="md-file-input" accept=".md,.markdown,text/markdown"
-             style="display:none" onchange="handleFileSelect(this)" />
-      <div class="parse-preview" id="parse-preview"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('upload-modal')">Cancel</button>
-        <button class="btn-primary" id="import-btn" onclick="importChecklist()" style="display:none">Import</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─── ACCOUNT MODAL ────────────────────────────────────────────── -->
-  <div class="modal-overlay" id="account-modal">
-    <div class="modal modal-wide">
-      <div class="account-modal-header">
-        <div class="account-modal-avatar" id="account-modal-avatar">?</div>
-        <div>
-          <div class="modal-label">Account</div>
-          <div class="modal-title" id="account-modal-title">Settings</div>
-          <div class="account-modal-email" id="account-modal-email">—</div>
+        <div class="workflow-step">
+          <div class="workflow-dot" aria-hidden="true">2</div>
+          <div class="workflow-step-content">
+            <h3 class="workflow-step-title">Structure</h3>
+            <p class="workflow-step-desc">Organize tasks into sections. Add items, reorder, and refine your process.</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-dot" aria-hidden="true">3</div>
+          <div class="workflow-step-content">
+            <h3 class="workflow-step-title">Execute</h3>
+            <p class="workflow-step-desc">Work through your checklist. Progress saves automatically. Pick up where you left off.</p>
+          </div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-dot" aria-hidden="true">4</div>
+          <div class="workflow-step-content">
+            <h3 class="workflow-step-title">Iterate</h3>
+            <p class="workflow-step-desc">After each cycle, improve your checklist. Operational knowledge compounds over time.</p>
+          </div>
         </div>
       </div>
-      <div id="account-msg" class="account-msg"></div>
+    </div>
+  </section>
 
-      <div class="account-section">
-        <div class="account-section-title">Profile</div>
-        <form class="account-form" onsubmit="handleUpdateName(event)">
-          <div class="account-field">
-            <label for="account-name-input">Display name</label>
-            <input type="text" id="account-name-input" placeholder="Your name" autocomplete="name" />
-          </div>
-          <button type="submit" class="btn-primary account-save-btn" id="account-name-btn">Save name</button>
-        </form>
-      </div>
+  <!-- Quote -->
+  <section class="quote-section section-padding reveal" id="quote">
+    <div class="container">
+      <blockquote class="quote-text">"We stopped losing context between deploys. CheckOps turned our chaotic runbooks into reliable, repeatable processes that every engineer can follow."</blockquote>
+      <p class="quote-author">— Sarah Chen, Head of Platform Engineering</p>
+    </div>
+  </section>
 
-      <div class="account-section">
-        <div class="account-section-title">Email</div>
-        <form class="account-form" onsubmit="handleChangeEmail(event)">
-          <div class="account-field">
-            <label for="account-email-input">New email address</label>
-            <input type="email" id="account-email-input" placeholder="you@company.com" autocomplete="email" />
-          </div>
-          <p class="account-hint">A confirmation link will be sent to the new address.</p>
-          <button type="submit" class="btn-primary account-save-btn" id="account-email-btn">Update email</button>
-        </form>
-      </div>
-
-      <div class="account-section">
-        <div class="account-section-title">Password</div>
-        <form class="account-form" onsubmit="handleChangePassword(event)">
-          <div class="account-field">
-            <label for="account-new-password">New password</label>
-            <input type="password" id="account-new-password" placeholder="••••••••••" autocomplete="new-password" minlength="8" />
-          </div>
-          <div class="account-field">
-            <label for="account-confirm-password">Confirm password</label>
-            <input type="password" id="account-confirm-password" placeholder="••••••••••" autocomplete="new-password" minlength="8" />
-          </div>
-          <button type="submit" class="btn-primary account-save-btn" id="account-password-btn">Change password</button>
-        </form>
-        <button type="button" class="btn-outline account-alt-btn" onclick="handleAccountPasswordReset()">Send reset link instead</button>
-      </div>
-
-      <div class="account-section">
-        <div class="account-section-title">Invite teammates</div>
-        <p class="account-hint">Share CheckOps with someone on your team.</p>
-        <form class="account-form" onsubmit="handleSendInvite(event)">
-          <div class="account-field">
-            <label for="invite-email-input">Invite by email</label>
-            <input type="email" id="invite-email-input" placeholder="colleague@company.com" autocomplete="email" />
-          </div>
-          <div class="account-invite-actions">
-            <button type="submit" class="btn-primary account-save-btn">Send invite</button>
-            <button type="button" class="btn-outline" onclick="copyInviteLink()">Copy invite link</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-actions account-modal-footer">
-        <button class="btn-cancel" onclick="closeModal('account-modal')">Close</button>
-        <button class="btn-signout-modal" onclick="signOut()">Sign out</button>
+  <!-- Pricing -->
+  <section class="pricing section-padding reveal" id="pricing">
+    <div class="container">
+      <p class="pricing-eyebrow">Pricing</p>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="pricing-price">$0<span>/month</span></div>
+          <p>For individual engineers and small teams</p>
+          <ul>
+            <li>Up to 10 checklists</li>
+            <li>Markdown import</li>
+            <li>Cloud sync</li>
+            <li>Email support</li>
+          </ul>
+          <a href="auth/index.html" target="_blank" class="btn-secondary">Get Started</a>
+        </div>
+        <div class="pricing-card pricing-featured">
+          <span class="pricing-badge">Popular</span>
+          <h3>Team</h3>
+          <div class="pricing-price">$12<span>/month per seat</span></div>
+          <p>For engineering teams that ship together</p>
+          <ul>
+            <li>Unlimited checklists</li>
+            <li>Team collaboration</li>
+            <li>Shared templates</li>
+            <li>Activity history</li>
+            <li>Priority support</li>
+            <li>SSO &amp; SAML</li>
+          </ul>
+          <a href="auth/index.html" target="_blank" class="btn-primary">Start Free Trial</a>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── TOASTS ───────────────────────────────────────────────────── -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- Final CTA -->
+  <section class="final-cta section-padding reveal" id="cta">
+    <div class="container">
+      <h2 class="section-title">Start building checklists that stick.</h2>
+      <p class="body-text">Free to start. No credit card required.</p>
+      <a href="auth/index.html" target="_blank" class="btn-primary">Start Free</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo">
+  <img src="checkpos.png" alt="CheckOps Logo" class="nav-logo-icon">
+  <span class="nav-logo-text">CheckOps</span>
+</div>
+          <p>Persistent checklists for engineering teams.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#capabilities">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API Reference</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Community</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 CheckOps. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="script.js"></script>
+
+<canvas id="particle-bg" style="position:fixed;inset:0;z-index:-1;pointer-events:none"></canvas>
+
+  <script src="background.js"></script>
+
 </body>
 </html>
