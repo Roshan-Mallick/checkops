@@ -403,27 +403,62 @@ function showAccountModal() {
     modal.classList.add('open');
   }
 }
-
 async function handleUpdateName(e) {
   e.preventDefault();
-  if (!sb || !currentUser) return;
-  const name = document.getElementById('account-name-input').value.trim();
-  if (!name) { showAccountMsg('Please enter a name.', 'error'); return; }
 
+  if (!sb || !currentUser) return;
+
+  const nameInput = document.getElementById('account-name-input');
   const btn = document.getElementById('account-name-btn');
+
+  if (!nameInput || !btn) return;
+
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    showAccountMsg('Please enter a name.', 'error');
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
   try {
-    const { data, error } = await sb.auth.updateUser({ data: { full_name: name } });
+    const { data, error } = await sb.auth.updateUser({
+      data: { full_name: name }
+    });
+
     if (error) throw error;
+
     currentUser = data.user;
+
     updateUserDisplay();
-    document.getElementById('account-modal-title').textContent = name;
-    document.getElementById('account-modal-avatar').textContent = getAvatarLetter(currentUser);
+
+    const modalTitle = document.getElementById('account-modal-title');
+    if (modalTitle) {
+      modalTitle.textContent = name;
+    }
+
+    const modalTitleMobile = document.getElementById('account-modal-title-mobile');
+    if (modalTitleMobile) {
+      modalTitleMobile.textContent = name;
+    }
+
+    const modalAvatar = document.getElementById('account-modal-avatar');
+    if (modalAvatar) {
+      modalAvatar.textContent = getAvatarLetter(currentUser);
+    }
+
+    const modalAvatarMobile = document.getElementById('account-modal-avatar-mobile');
+    if (modalAvatarMobile) {
+      modalAvatarMobile.textContent = getAvatarLetter(currentUser);
+    }
+
     showAccountMsg('Name updated successfully.');
     showToast('Profile updated.');
+
   } catch (err) {
+    console.error('Update name error:', err);
     showAccountMsg(err.message || 'Failed to update name.', 'error');
   } finally {
     btn.disabled = false;
