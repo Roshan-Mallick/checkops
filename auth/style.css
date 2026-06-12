@@ -1146,9 +1146,22 @@ body {
     flex-direction: column;
   }
 
-  .account-modal-sidebar {
-    display: none !important;
-  }
+.account-modal-sidebar {
+  display: flex !important;
+  flex-direction: column;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  border-right: none;
+  gap: 8px;
+}
+
+.account-modal-sidebar .account-nav-btn {
+  width: 100%;
+}
+
+.account-modal-sidebar-bottom {
+  margin-top: 8px;
+}
 
   .account-modal-body {
     display: flex;
