@@ -214,17 +214,58 @@ body {
 .auth-field input::placeholder { color: var(--text3); }
 
 /* password show/hide toggle */
-.auth-pass-wrap { position: relative; }
-.auth-pass-wrap input { padding-right: 44px; }
-.auth-pass-toggle {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-  background: none; border: none; cursor: pointer; color: var(--text3);
-  padding: 0; display: flex; transition: color 0.2s;
+.auth-pass-wrap {
+  position: relative;
 }
-.auth-pass-toggle:hover { color: var(--auth-text2); }
-.auth-pass-toggle .icon-eye-off { display: none; }
-.auth-pass-toggle.showing .icon-eye { display: none; }
-.auth-pass-toggle.showing .icon-eye-off { display: block; }
+
+.auth-pass-wrap input {
+  padding-right: 44px;
+}
+
+.auth-pass-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.auth-pass-toggle:hover {
+  color: var(--auth-text2);
+}
+
+.auth-pass-toggle svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+/* Show only one icon at a time */
+.auth-pass-toggle .icon-eye {
+  display: block;
+}
+
+.auth-pass-toggle .icon-eye-off {
+  display: none;
+}
+
+.auth-pass-toggle.showing .icon-eye {
+  display: none;
+}
+
+.auth-pass-toggle.showing .icon-eye-off {
+  display: block;
+}
 
 /* inline text buttons (forgot password / switch view) */
 .auth-inline-btn {
@@ -326,12 +367,8 @@ body {
 .auth-pass-wrap { position: relative; z-index: 10; }
 
 /* hide left panel on smaller screens */
-@media (max-width: 860px) {
-  .auth-panel-left { display: none; }
-}
 
 
-/* ── App Shell ───────────────────────────────────────────────── */
 /* The main app wrapper — hidden until user is authenticated */
 #app-screen { display: none; min-height: 100vh; background: var(--bg); }
 
@@ -431,7 +468,7 @@ body {
 .sidebar-section-label {
   padding: 8px 18px 10px; font-size: 12px; font-weight: 500; color: var(--text3);
 }
-.sidebar-lists { flex: 1; overflow: hidden; padding: 0 10px 10px; }
+.sidebar-lists { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 10px 10px; }
 
 /* individual checklist row in the sidebar */
 .list-item {
@@ -724,6 +761,7 @@ body {
 }
 .account-field input:focus { border-color: rgba(201,168,108,0.4); }
 .account-field input::placeholder { color: var(--text3); }
+.account-field .auth-pass-wrap input { padding-right: 44px; }
 .account-hint { font-size: 12px; color: var(--text3); line-height: 1.5; }
 .account-save-btn { width: auto; align-self: flex-start; }
 .account-alt-btn { width: auto; align-self: flex-start; }
@@ -741,10 +779,23 @@ body {
 /* Close / Sign out row at the bottom of the modal (mobile) */
 .account-modal-footer { justify-content: space-between; border-top: 1px solid var(--border); padding-top: 18px; margin-top: 8px; }
 
-/* ── Account Modal — left nav sidebar (desktop only) ─────────── */
-/* Hidden by default; flex layout enabled above 641px via media query */
+/* modal-wide: base resets — layout handled entirely by media queries above */
+.modal-wide {
+  padding: 0;
+  overflow: hidden;
+  max-height: 92vh;
+}
+
+/* ── Account Modal — sidebar hidden by default, shown on desktop ── */
 .account-modal-sidebar { display: none; }
-.account-modal-body { display: contents; }
+
+/* account-modal-body: mobile default — full scrollable block */
+.account-modal-body {
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 20px;
+}
 
 /* nav items in the left sidebar */
 .account-nav-item {
@@ -868,41 +919,47 @@ body {
 }
 
 
-/* ── Responsive — Desktop Modal & Sidebar ────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — DESKTOP FIRST (≥ 641px)
+   Account modal: centred dialog with two-column grid layout
+   ═══════════════════════════════════════════════════════════════ */
 @media (min-width: 641px) {
-  /* on desktop modals are centred, not bottom-sheet */
+  /* centre modals on desktop */
   .modal-overlay { align-items: center; padding: 32px; }
   .modal { border-radius: var(--radius-xl); animation: modalIn 0.3s var(--ease); }
 
-  /* account modal becomes a two-column grid: nav left, content right */
+  /* two-column grid: sidebar nav | scrollable content */
   .modal-wide {
     display: grid;
     grid-template-columns: 170px 1fr;
     gap: 0;
-    padding: 0;
+    padding: 0 !important;
     max-width: 720px;
-    min-height: 520px; /* tall enough for margin-top:auto to push danger nav down */
+    min-height: 520px;
     overflow: hidden;
   }
 
-  /* left nav column */
+  /* left sidebar nav */
   .account-modal-sidebar {
-    background: var(--surface2);
-    border-right: 1px solid var(--border);
-    padding: 20px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    justify-content: flex-start;
+    background: var(--surface2);
+    border-right: 1px solid var(--border);
+    padding: 20px 16px;
   }
 
-  /* right content column */
+  /* right scrollable content */
   .account-modal-body {
     display: block;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     max-height: 88vh;
     padding: 32px 36px;
   }
+
+  /* hide mobile-only header inside body on desktop (sidebar nav replaces it) */
+  .account-modal-header { display: none; }
 }
 
 @keyframes modalIn {
@@ -910,35 +967,61 @@ body {
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* mobile: modal-wide stacks vertically */
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 640px)
+   Account modal: bottom-sheet, full-width, body scrolls
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  .modal-wide { overflow-y: auto; padding: 0; }
-  .account-modal-body {
-    display: block;
-    overflow-y: auto;
-    max-height: calc(92vh - 48px);
-    padding: clamp(20px, 5vw, 32px);
+  /* account modal: bottom sheet that fills up to 92vh */
+  .modal-wide {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    overflow: hidden !important;   /* parent does NOT scroll */
+    max-height: 92vh !important;
+    width: 100% !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
   }
+
+  /* sidebar nav: hidden on mobile */
+  .account-modal-sidebar { display: none !important; }
+
+  /* body: THIS is the scroll container */
+  .account-modal-body {
+    display: block !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;      /* required for flex scroll to work */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 24px 20px !important;
+  }
+
+  /* show mobile header and footer */
+  .account-modal-header { display: flex; }
+  .account-modal-footer { display: flex; }
 }
 
 
-/* ── Responsive — Mobile App Layout ─────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE APP LAYOUT (≤ 900px)
+   Sidebar becomes a slide-in overlay, topbar appears
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  /* show the mobile top bar */
   .app-topbar { display: flex !important; }
 
-  /* stack the layout vertically */
   .app-layout {
     display: block !important;
     width: 100% !important;
     overflow-x: hidden !important;
   }
 
-  /* sidebar slides in from the left as a fixed overlay */
   .sidebar {
     position: fixed !important;
-    left: 0 !important; top: 0 !important;
-    height: 100vh !important; width: 272px !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
+    width: 272px !important;
     transform: translateX(-100%) !important;
     transition: transform 0.32s var(--ease) !important;
     box-shadow: var(--shadow-md) !important;
@@ -946,55 +1029,71 @@ body {
   }
   .sidebar.open { transform: translateX(0) !important; }
 
-  /* hide the new checklist button inside the sidebar header on mobile
-     (there's already a "New" button in the top bar) */
   .sidebar-header .btn-new { display: none !important; }
-
-  /* hide the account trigger footer on mobile — use the top avatar instead */
-  .sidebar-footer { display: none; }
+  .sidebar-footer { display: none !important; }
 
   .main {
-    width: 100% !important; min-width: 0 !important;
-    min-height: calc(100vh - 56px) !important; display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: calc(100vh - 56px) !important;
+    display: block !important;
   }
   .empty-state { min-height: calc(100vh - 56px) !important; }
 }
 
-/* show desktop account sidebar nav above 641px */
-@media (min-width: 641px) {
-  .account-modal-sidebar { display: flex; flex-direction: column; }
-}
 
-
-/* ── Responsive — Small Screens ──────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — SMALL SCREENS (≤ 540px)
+   Stacked buttons, single-column grids
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 540px) {
   .new-checklist-options { grid-template-columns: 1fr; }
+
   .empty-actions { flex-direction: column; }
-  .empty-actions .btn-outline, .empty-actions .btn-primary { width: 100%; }
+  .empty-actions .btn-outline,
+  .empty-actions .btn-primary { width: 100%; }
+
   .account-invite-actions { flex-direction: column; }
-  .account-invite-actions .btn-outline, .account-invite-actions .btn-primary { width: 100%; justify-content: center; }
+  .account-invite-actions .btn-outline,
+  .account-invite-actions .btn-primary { width: 100%; justify-content: center; }
+
+  .account-password-actions { flex-direction: column; }
+  .account-password-actions .btn-primary,
+  .account-password-actions .btn-outline { width: 100%; justify-content: center; }
+
   .checklist-meta { flex-direction: column; }
+
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions button { width: 100%; justify-content: center; }
+
   .account-modal-footer { flex-direction: column-reverse; gap: 10px; }
   .account-modal-footer button { width: 100%; text-align: center; justify-content: center; }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — VERY SMALL (≤ 380px)
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 380px) {
   .app-topbar { padding: 0 12px; gap: 8px; }
-  .sidebar { width: min(292px, 88vw); }
+  .sidebar { width: min(272px, 88vw) !important; }
 }
 
 
-/* ── Auth — Mobile (≤ 480px) ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — AUTH SCREEN MOBILE (≤ 860px / ≤ 480px)
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  .auth-panel-left { display: none; }
+}
+
 @media (max-width: 480px) {
-  .auth-header { padding: 0 clamp(12px, 3vw, 20px); }
-  .auth-header-tabs { display: none; } /* tabs are redundant — there's only room for the form */
+  .auth-header { padding: 0 16px; }
+  .auth-header-tabs { display: none; }
   .auth-panel-right { padding: 20px 16px; align-items: flex-start; }
   .auth-form-wrap { max-width: 100%; }
   .auth-form-title { font-size: 22px; }
   .auth-stats { gap: 16px; }
-  .new-checklist-options { grid-template-columns: 1fr; }
   .modal { padding: 20px 16px; }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions button { width: 100%; justify-content: center; }
