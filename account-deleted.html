@@ -64,6 +64,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="card">
@@ -79,6 +80,28 @@
       Create New Account
     </a>
   </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const sb = createClient(
+      'https://gnzkwjzssumrnafqrmof.supabase.co',
+      'sb_publishable_4O8Oegbf4JCx1nynZiHPlA_N41BvOpR'
+    )
+
+    try {
+      await sb.auth.signOut()
+    } catch (e) {
+      console.error(e)
+    }
+
+    localStorage.clear()
+    sessionStorage.clear()
+
+    setTimeout(() => {
+      window.location.replace('/auth/index.html')
+    }, 3000)
+  </script>
 
 </body>
 </html>
