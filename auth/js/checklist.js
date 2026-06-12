@@ -61,6 +61,13 @@ function loadChecklist(id) {
 
 // ─── Render ───────────────────────────────────────────────────────────────
 
+const ICON_RESET  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`;
+const ICON_TRASH  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+const ICON_PLUS   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+const ICON_DOWN   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>`;
+const ICON_MINUS  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+const ICON_CLOSE  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
 function renderChecklist(cl) {
   const checklist  = document.getElementById('checklist-view');
   const emptyState = document.getElementById('empty-state');
@@ -82,8 +89,8 @@ function renderChecklist(cl) {
         </h2>
         <div class="meta-pill">${checked} / ${total} done</div>
       </div>
-      <button class="btn-icon" title="Reset all" onclick="resetAll()">↻</button>
-      <button class="btn-icon danger" title="Delete" onclick="confirmDelete('${cl.id}')">🗑</button>
+      <button class="btn-icon" title="Reset all" onclick="resetAll()">${ICON_RESET}</button>
+      <button class="btn-icon danger" title="Delete checklist" onclick="confirmDelete('${cl.id}')">${ICON_TRASH}</button>
     </div>
     <div class="sections-container" id="sections"></div>
   `;
@@ -113,9 +120,9 @@ function renderSections(cl) {
                  style="display:none" />
         </h3>
         <div class="section-count">${section.items.filter(i => i.checked).length}/${section.items.length}</div>
-        <button class="btn-icon" title="Add item" onclick="addItem(${si})">+</button>
-        <button class="btn-icon" title="Add section below" onclick="addSection()">↓</button>
-        <button class="btn-icon danger" title="Delete section" onclick="deleteSection(${si})">−</button>
+        <button class="btn-icon" title="Add item" onclick="addItem(${si})">${ICON_PLUS}</button>
+        <button class="btn-icon" title="Add section below" onclick="addSection()">${ICON_DOWN}</button>
+        <button class="btn-icon danger" title="Delete section" onclick="deleteSection(${si})">${ICON_MINUS}</button>
       </div>
       <div class="items" id="items-${si}"></div>
     `;
@@ -143,7 +150,7 @@ function createItemRow(cl, si, ii) {
            onclick="event.stopPropagation()"
            style="display:none" />
     <button class="item-del" title="Delete"
-            onclick="event.stopPropagation(); deleteItem(${si}, ${ii})">✕</button>
+            onclick="event.stopPropagation(); deleteItem(${si}, ${ii})">${ICON_CLOSE}</button>
   `;
   return row;
 }

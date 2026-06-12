@@ -46,7 +46,7 @@ body {
 }
 
 /* thin scrollbars everywhere */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
 
@@ -416,7 +416,7 @@ body {
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar {
-  width: 272px;
+  width: 280px;
   flex-shrink: 0;
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -428,7 +428,7 @@ body {
   overflow: hidden;
   z-index: 50;
 }
-.sidebar-header { padding: 22px 18px 18px; }
+.sidebar-header { padding: 20px 16px 16px; }
 
 /* top row inside sidebar header: logo left, avatar right */
 .sidebar-header-top {
@@ -454,51 +454,57 @@ body {
 
 /* "New checklist" button */
 .btn-new {
-  width: 100%; padding: 11px 14px;
+  width: 100%; padding: 12px 14px;
   background: var(--accent); border: none;
   border-radius: var(--radius); color: var(--accent-fg);
   font-family: var(--sans); font-size: 13px; font-weight: 600;
   cursor: pointer; display: flex; align-items: center; gap: 8px;
-  transition: background 0.2s var(--ease);
-  box-shadow: var(--shadow-sm);
+  transition: background 0.18s var(--ease), box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(201,168,108,0.18);
+  letter-spacing: -0.01em;
 }
 .btn-new:hover { background: var(--accent-hover); }
 .btn-new svg { width: 15px; height: 15px; flex-shrink: 0; }
 
 .sidebar-section-label {
-  padding: 8px 18px 10px; font-size: 12px; font-weight: 500; color: var(--text3);
+  padding: 6px 16px 8px;
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  letter-spacing: 0.07em; text-transform: uppercase;
 }
 .sidebar-lists { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 10px 10px; }
 
 /* individual checklist row in the sidebar */
 .list-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-radius: var(--radius);
+  padding: 9px 12px; border-radius: 8px;
   cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 500;
   transition: background 0.15s var(--ease), color 0.15s; user-select: none;
+  margin-bottom: 1px;
 }
 .list-item:hover { background: var(--surface2); color: var(--text); }
 .list-item.active {
   background: var(--surface2); color: var(--text);
   box-shadow: inset 3px 0 0 var(--accent);
+  font-weight: 600;
 }
 .list-item-icon { font-size: 13px; flex-shrink: 0; opacity: 0.35; }
 .list-item-name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .list-item-count, .list-item-prog {
-  font-size: 11px; color: var(--text3); font-family: var(--mono); flex-shrink: 0;
+  font-size: 10px; color: var(--text3); font-family: var(--mono); flex-shrink: 0;
+  background: var(--surface3); padding: 2px 6px; border-radius: 4px;
 }
 
 /* account trigger at the bottom of the sidebar */
 .sidebar-footer { padding: 14px 12px 16px; border-top: 1px solid var(--border); }
 .account-trigger {
   width: 100%; display: flex; align-items: center; gap: 11px;
-  padding: 10px 12px; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 10px 12px; background: transparent;
+  border: 1px solid transparent; border-radius: var(--radius-lg);
   cursor: pointer; font-family: var(--sans); text-align: left; color: inherit;
   transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
   -webkit-appearance: none; appearance: none;
 }
-.account-trigger:hover { background: var(--surface3); border-color: var(--border2); }
+.account-trigger:hover { background: var(--surface2); border-color: var(--border); }
 .account-trigger-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .account-name {
   display: block; font-size: 13px; font-weight: 600; color: var(--text);
@@ -538,10 +544,10 @@ body {
   min-height: calc(100vh - 56px); padding: clamp(24px, 6vw, 48px); text-align: center;
 }
 .empty-icon {
-  width: 52px; height: 52px; background: var(--surface);
-  border: 1px solid var(--border2); border-radius: var(--radius-lg);
+  width: 48px; height: 48px; background: var(--accent-dim);
+  border: 1px solid rgba(201,168,108,0.2); border-radius: var(--radius-lg);
   display: flex; align-items: center; justify-content: center;
-  color: var(--accent); margin-bottom: 22px;
+  color: var(--accent); margin-bottom: 24px;
 }
 .empty-label { font-size: 12px; font-weight: 500; color: var(--text3); margin-bottom: 8px; }
 .empty-title {
@@ -578,10 +584,12 @@ body {
 
 /* small icon-only button used in checklist meta bar */
 .btn-icon {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text3); font-size: 13px;
-  padding: 5px 9px; cursor: pointer; font-family: var(--mono);
-  transition: all 0.15s; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text2); font-size: 13px;
+  padding: 6px 10px; cursor: pointer; font-family: var(--mono);
+  transition: all 0.15s var(--ease); flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px;
 }
 .btn-icon:hover { background: var(--surface2); color: var(--text); }
 .btn-icon.danger:hover { color: var(--danger); border-color: rgba(224,122,122,0.25); }
@@ -604,18 +612,18 @@ body {
 
 /* ── Checklist View ──────────────────────────────────────────── */
 .checklist-view {
-  max-width: 720px; margin: 0 auto;
-  padding: clamp(28px, 5vw, 52px) clamp(16px, 4vw, 32px) 80px;
+  max-width: 680px; margin: 0 auto;
+  padding: clamp(36px, 5vw, 56px) clamp(20px, 4vw, 40px) 100px;
 }
 .checklist-meta {
   display: flex; align-items: flex-start; gap: 14px;
-  margin-bottom: 32px; flex-wrap: wrap;
-  padding-bottom: 24px; border-bottom: 1px solid var(--border);
+  margin-bottom: 36px; flex-wrap: wrap;
+  padding-bottom: 28px; border-bottom: 1px solid var(--border);
 }
 .meta-content { flex: 1; min-width: 0; }
 .checklist-title {
-  font-size: clamp(22px, 4vw, 28px); font-weight: 700;
-  letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 10px;
+  font-size: clamp(24px, 4vw, 32px); font-weight: 700;
+  letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 12px;
 }
 .checklist-title span {
   cursor: text; border-radius: 6px; padding: 2px 4px; margin-left: -4px;
@@ -633,68 +641,93 @@ body {
 
 /* thin progress bar at the top of each checklist */
 .progress-bar, .progress-bar-wrap {
-  width: 100%; height: 4px; background: var(--surface3);
-  border-radius: 99px; overflow: hidden; margin-bottom: 14px;
+  width: 100%; height: 3px; background: var(--surface3);
+  border-radius: 3px; overflow: hidden; margin-bottom: 16px;
 }
 .progress-bar-fill {
   height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-hover));
-  border-radius: 99px; transition: width 0.45s var(--ease);
+  border-radius: 3px; transition: width 0.5s var(--ease);
 }
 
 /* "X / Y done" pill */
 .meta-pill {
-  font-size: 12px; font-family: var(--mono); color: var(--text2);
-  background: var(--surface2); padding: 4px 11px;
-  border-radius: 99px; border: 1px solid var(--border); display: inline-block;
+  font-size: 11px; font-family: var(--mono); color: var(--text2);
+  background: var(--surface2); padding: 5px 12px;
+  border-radius: 5px; border: 1px solid var(--border); display: inline-block;
+  letter-spacing: 0.01em;
 }
 .meta-pill.done { color: var(--green); background: var(--green-dim); border-color: rgba(109,175,130,0.2); }
 
 /* sections and items */
 .sections-container { margin-top: 4px; }
-.section { margin-bottom: 8px; }
+.section { margin-bottom: 16px; }
 .section-header {
   display: flex; align-items: center; gap: 8px;
-  padding: 12px 8px 8px; margin-bottom: 2px;
+  padding: 10px 10px 8px; margin-bottom: 4px;
+  border-radius: var(--radius);
+  transition: background 0.15s;
 }
-.section-header:hover { background: var(--surface); border-radius: var(--radius); }
+.section-header:hover { background: var(--surface2); }
 .section-title { flex: 1; display: flex; align-items: center; min-width: 0; }
 .section-title span {
-  font-size: 12px; font-weight: 600; color: var(--text3);
-  letter-spacing: 0.02em; cursor: text; flex: 1;
+  font-size: 11px; font-weight: 600; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase; cursor: text; flex: 1;
 }
 .section-title-input {
   font-size: 12px; font-weight: 600; color: var(--text2);
   background: transparent; border: none; border-bottom: 1px solid var(--accent);
   outline: none; flex: 1; padding: 2px 0; font-family: var(--sans);
 }
-.section-count { font-family: var(--mono); font-size: 11px; color: var(--text3); flex-shrink: 0; }
-.items { padding: 2px 4px 8px; }
+.section-count { font-family: var(--mono); font-size: 10px; color: var(--text3); flex-shrink: 0; letter-spacing: 0.02em; }
+.items { padding: 2px 0 12px; }
 
 .item {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 8px 8px; border-radius: var(--radius);
-  cursor: pointer; transition: background 0.12s; position: relative;
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 12px; border-radius: var(--radius);
+  cursor: pointer; transition: background 0.15s var(--ease), box-shadow 0.15s; position: relative;
+  margin-bottom: 2px;
 }
-.item:hover { background: var(--surface); }
+.item:hover {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
 .item.checked .item-label {
-  color: var(--text3); text-decoration: line-through; text-decoration-color: var(--text3);
+  color: var(--text3);
+  text-decoration: line-through;
+  text-decoration-color: var(--text3);
+  text-decoration-thickness: 1px;
+  opacity: 0.7;
 }
 .item input[type="checkbox"] {
-  width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px;
+  width: 22px; height: 22px; flex-shrink: 0;
   appearance: none; -webkit-appearance: none;
-  border-radius: 6px; border: 1.5px solid var(--border2);
+  border-radius: 7px; border: 1.5px solid var(--surface3);
   background: var(--surface2); cursor: pointer;
-  transition: all 0.15s; position: relative;
+  transition: all 0.18s var(--ease); position: relative;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
 }
-.item input[type="checkbox"]:checked { background: var(--green); border-color: var(--green); }
+.item input[type="checkbox"]:hover {
+  border-color: var(--border2);
+  background: var(--surface3);
+}
+.item input[type="checkbox"]:checked {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(109,175,130,0.15);
+}
 .item input[type="checkbox"]:checked::after {
-  content: '✓'; position: absolute; color: var(--accent-fg);
-  font-size: 12px; font-weight: 700; line-height: 1;
-  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  content: '';
+  position: absolute;
+  left: 6px; top: 3px;
+  width: 6px; height: 10px;
+  border: solid var(--accent-fg);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 .item-label {
-  flex: 1; font-size: 14px; color: var(--text); line-height: 1.5;
+  flex: 1; font-size: 14px; color: var(--text); line-height: 1.45;
   cursor: text; min-width: 0; word-break: break-word;
+  letter-spacing: -0.01em;
 }
 .item-label-input {
   flex: 1; font-size: 14px; color: var(--text);
