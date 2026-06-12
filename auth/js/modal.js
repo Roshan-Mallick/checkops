@@ -5,6 +5,31 @@ function closeModal(id) {
   document.body.style.overflow = '';
 }
 
+let confirmAction = null;
+
+function showConfirmModal({
+  label = 'Confirmation',
+  title = 'Are you sure?',
+  message = '',
+  onConfirm = null
+}) {
+  document.getElementById('confirm-label').textContent = label;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+
+  confirmAction = onConfirm;
+
+  document.getElementById('confirm-action-btn').onclick = () => {
+    closeModal('confirm-modal');
+
+    if (typeof confirmAction === 'function') {
+      confirmAction();
+    }
+  };
+
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
 // Click outside the modal box to close
 document.addEventListener('click', function (e) {
   if (e.target.classList.contains('modal-overlay')) {

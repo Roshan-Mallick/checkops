@@ -495,6 +495,40 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+
+    <div class="modal-label" id="confirm-label">
+      Confirmation
+    </div>
+
+    <h3 class="modal-title" id="confirm-title">
+      Are you sure?
+    </h3>
+
+    <p class="modal-description" id="confirm-message">
+      This action cannot be undone.
+    </p>
+
+    <div class="modal-actions">
+      <button
+        type="button"
+        class="btn-outline"
+        onclick="closeModal('confirm-modal')">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        id="confirm-action-btn">
+        Confirm
+      </button>
+    </div>
+
+  </div>
+</div>
+
   <!-- ─── TOASTS ───────────────────────────────────────────────────── -->
   <div class="toast-container" id="toast-container"></div>
 

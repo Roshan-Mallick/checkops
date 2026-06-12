@@ -276,14 +276,33 @@ function deleteSection(si) {
 }
 
 function resetAll() {
-  const cl = getActive(); if (!cl) return;
-  if (!confirm('Reset all checkboxes? This cannot be undone.')) return;
-  cl.data.forEach(s => s.items.forEach(i => i.checked = false));
-  persistChecklist(cl);
-  renderChecklist(cl); renderSidebar();
-  showToast('All checkboxes reset.');
+  const cl = getActive();
+  if (!cl) return;
+
+  showConfirmModal({
+    label: 'Reset checklist',
+    title: 'Reset all checkboxes?',
+    message: 'All completed items will be unchecked.',
+    onConfirm: () => {
+      cl.data.forEach(section =>
+        section.items.forEach(item => item.checked = false)
+      );
+
+      persistChecklist(cl);
+      renderChecklist(cl);
+      renderSidebar();
+      showToast('All checkboxes reset.');
+    }
+  });
 }
 
 function confirmDelete(id) {
-  if (confirm('Delete this checklist?')) deleteChecklist(id);
+  showConfirmModal({
+    label: 'Delete checklist',
+    title: 'Delete this checklist?',
+    message: 'This action cannot be undone.',
+    onConfirm: () => {
+      deleteChecklist(id);
+    }
+  });
 }
