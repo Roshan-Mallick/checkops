@@ -1,0 +1,118 @@
+// ─── Modal helpers ────────────────────────────────────────────────────────
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ─── New checklist modal ──────────────────────────────────────────────────
+
+function showNewListModal() {
+  document.getElementById('new-checklist-modal').classList.add('open');
+}
+
+function chooseUploadChecklist() {
+  closeModal('new-checklist-modal');
+  showUploadModal();
+}
+
+function chooseBlankChecklist() {
+  closeModal('new-checklist-modal');
+  createBlankChecklist();
+}
+
+// ─── Upload / import modal ────────────────────────────────────────────────
+
+function showUploadModal() {
+  document.getElementById('upload-modal').classList.add('open');
+  parsedData = null;
+  document.getElementById('import-btn').style.display    = 'none';
+  document.getElementById('parse-preview').style.display = 'none';
+
+  const zone = document.getElementById('upload-zone');
+  if (zone) {
+    zone.classList.remove('drag');
+    zone.querySelector('.upload-zone-text').textContent = 'Drop your .md file here';
+  }
+
+  document.getElementById('md-file-input').value = '';
+}
+
+// ─── Drag-and-drop handlers ───────────────────────────────────────────────
+
+function handleDragOver(e)  {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.add('drag');
+}
+
+function handleDragLeave() {
+  document.getElementById('upload-zone').classList.remove('drag');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  handleDragLeave();
+  const f = e.dataTransfer.files[0];
+  if (f) readMdFile(f);
+}
+
+function handleFileSelect(inp) {
+  if (inp.files[0]) readMdFile(inp.files[0]);
+}
+
+// ─── Markdown file reader ─────────────────────────────────────────────────
+
+function readMdFile(file) {
+  if (!file.name.match(/\.(md|markdown)$/i) && file.type !== 'text/markdown') {
+    showToast('Please upload a .md file.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text     = e.target.result;
+    const sections = parseMd(text);
+
+    if (!sections.length) {
+      showToast('No checklist items found in this file.', 'error');
+      return;
+    }
+
+    const title = (text.match(/^#\s+(.+)/m) || [])[1]?.trim()
+                || file.name.replace(/\.(md|markdown)$/i, '');
+
+    parsedData = { title, sections };
+
+    const prev = document.getElementById('parse-preview');
+    prev.style.display = 'block';
+    prev.innerHTML =
+      `<strong style="color:var(--accent)">${esc(title)}</strong><br><br>` +
+      sections.map(s =>
+        `<span style="color:var(--text3)">## ${esc(s.title)}</span><br>` +
+        s.items.map(i => `&nbsp;&nbsp;- [ ] ${esc(i.label)}`).join('<br>')
+      ).join('<br><br>');
+
+    document.getElementById('import-btn').style.display = 'flex';
+    document.getElementById('upload-zone').querySelector('.upload-zone-text').textContent = file.name;
+  };
+  reader.readAsText(file);
+}
+
+// ─── Sidebar toggle ───────────────────────────────────────────────────────
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('open');
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────
+
+function showEmptyState() {
+  document.getElementById('empty-state').style.display    = 'flex';
+  document.getElementById('checklist-view').style.display = 'none';
+}
