@@ -1,23 +1,18 @@
-(function () {
-  const c = document.getElementById('bg-canvas');
+(() => {
+  'use strict';
+
+  const c = document.getElementById('particle-bg');
   if (!c) return;
   const ctx = c.getContext('2d');
-  let W, H, stars = [], flow = [];
-  let centerX, beamTopY, prefersReduced = false;
+
+  let W, H, centerX, beamTopY;
+  let stars = [];
+  let flow = [];
   let animId = null;
+  const mqMobile = window.matchMedia('(max-width: 768px)');
+  let prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const mqReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mqMobile = window.matchMedia('(max-width: 768px)');
-  prefersReduced = mqReduced.matches;
-
-<<<<<<< HEAD
-  ctx.fillStyle='rgba(201,168,108,.4)';
-  ctx.fillRect(d.x,d.y,1.5,1.5);
- }
- requestAnimationFrame(loop);
-}
-resize();loop();
-=======
   mqReduced.addEventListener('change', function (e) { prefersReduced = e.matches; });
 
   function resize() {
@@ -152,5 +147,4 @@ resize();loop();
   window.addEventListener('resize', resize);
   document.addEventListener('visibilitychange', onVisibilityChange);
   animId = requestAnimationFrame(loop);
->>>>>>> 48ae549 (feat: release Quickcheck v0.9.4-beta foundation release)
 })();
